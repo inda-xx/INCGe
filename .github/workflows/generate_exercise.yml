@@ -28,6 +28,10 @@ on:
                   - hard
                   - v.hard
                 default: medium
+            exercise_1_skills:
+                description: 'Skills for Exercise 1 (comma-separated)'
+                required: true
+                default: 'Loops, Arrays'
             exercise_2_difficulty:
                 description: 'Difficulty level for Exercise 2'
                 required: false
@@ -37,6 +41,10 @@ on:
                   - medium
                   - hard
                   - v.hard
+            exercise_2_skills:
+                description: 'Skills for Exercise 2 (comma-separated)'
+                required: false
+                default: ''
             exercise_3_difficulty:
                 description: 'Difficulty level for Exercise 3'
                 required: false
@@ -46,6 +54,10 @@ on:
                   - medium
                   - hard
                   - v.hard
+            exercise_3_skills:
+                description: 'Skills for Exercise 3 (comma-separated)'
+                required: false
+                default: ''
             exercise_4_difficulty:
                 description: 'Difficulty level for Exercise 4'
                 required: false
@@ -55,6 +67,10 @@ on:
                   - medium
                   - hard
                   - v.hard
+            exercise_4_skills:
+                description: 'Skills for Exercise 4 (comma-separated)'
+                required: false
+                default: ''
             exercise_5_difficulty:
                 description: 'Difficulty level for Exercise 5'
                 required: false
@@ -64,6 +80,10 @@ on:
                   - medium
                   - hard
                   - v.hard
+            exercise_5_skills:
+                description: 'Skills for Exercise 5 (comma-separated)'
+                required: false
+                default: ''
             language:
                 description: 'Natural language for the exercise description'
                 required: true
@@ -103,12 +123,22 @@ jobs:
           TASK_LANGUAGE: ${{ github.event.inputs.language }}
           NUMBER_OF_EXERCISES: ${{ github.event.inputs.number_of_exercises }}
           EXERCISE_1_DIFFICULTY: ${{ github.event.inputs.exercise_1_difficulty }}
+          EXERCISE_1_SKILLS: ${{ github.event.inputs.exercise_1_skills }}
           EXERCISE_2_DIFFICULTY: ${{ github.event.inputs.exercise_2_difficulty || '' }}
+          EXERCISE_2_SKILLS: ${{ github.event.inputs.exercise_2_skills || '' }}
           EXERCISE_3_DIFFICULTY: ${{ github.event.inputs.exercise_3_difficulty || '' }}
+          EXERCISE_3_SKILLS: ${{ github.event.inputs.exercise_3_skills || '' }}
           EXERCISE_4_DIFFICULTY: ${{ github.event.inputs.exercise_4_difficulty || '' }}
+          EXERCISE_4_SKILLS: ${{ github.event.inputs.exercise_4_skills || '' }}
           EXERCISE_5_DIFFICULTY: ${{ github.event.inputs.exercise_5_difficulty || '' }}
+          EXERCISE_5_SKILLS: ${{ github.event.inputs.exercise_5_skills || '' }}
         run: |
-          python scripts/exercise_description.py "${{ secrets.OPENAI_TOKEN }}" "${{ github.event.inputs.subject }}" "${{ github.event.inputs.number_of_exercises }}" "${{ github.event.inputs.language }}" "${{ github.event.inputs.exercise_1_difficulty }}" "${{ github.event.inputs.exercise_2_difficulty }}" "${{ github.event.inputs.exercise_3_difficulty }}" "${{ github.event.inputs.exercise_4_difficulty }}" "${{ github.event.inputs.exercise_5_difficulty }}"
+          python scripts/exercise_description.py "${{ secrets.OPENAI_TOKEN }}" "${{ github.event.inputs.subject }}" "${{ github.event.inputs.number_of_exercises }}" "${{ github.event.inputs.language }}" \
+          "${{ github.event.inputs.exercise_1_difficulty }}" "${{ github.event.inputs.exercise_1_skills }}" \
+          "${{ github.event.inputs.exercise_2_difficulty }}" "${{ github.event.inputs.exercise_2_skills }}" \
+          "${{ github.event.inputs.exercise_3_difficulty }}" "${{ github.event.inputs.exercise_3_skills }}" \
+          "${{ github.event.inputs.exercise_4_difficulty }}" "${{ github.event.inputs.exercise_4_skills }}" \
+          "${{ github.event.inputs.exercise_5_difficulty }}" "${{ github.event.inputs.exercise_5_skills }}"
 
       # Configure Git user information
       - name: Configure Git
