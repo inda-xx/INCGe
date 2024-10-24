@@ -7,8 +7,19 @@ on:
                 description: 'Subject for the Exercise'
                 required: true
                 default: 'Write the subject of your exercise'
-            difficulty:
-                description: 'Difficulty level for the exercise'
+            number_of_exercises:
+                description: 'Number of exercises to generate'
+                required: true
+                type: choice
+                options:
+                  - 1
+                  - 2
+                  - 3
+                  - 4
+                  - 5
+                default: '3'
+            exercise_1_difficulty:
+                description: 'Difficulty level for Exercise 1'
                 required: true
                 type: choice
                 options:
@@ -17,6 +28,42 @@ on:
                   - hard
                   - v.hard
                 default: medium
+            exercise_2_difficulty:
+                description: 'Difficulty level for Exercise 2'
+                required: false
+                type: choice
+                options:
+                  - simple
+                  - medium
+                  - hard
+                  - v.hard
+            exercise_3_difficulty:
+                description: 'Difficulty level for Exercise 3'
+                required: false
+                type: choice
+                options:
+                  - simple
+                  - medium
+                  - hard
+                  - v.hard
+            exercise_4_difficulty:
+                description: 'Difficulty level for Exercise 4'
+                required: false
+                type: choice
+                options:
+                  - simple
+                  - medium
+                  - hard
+                  - v.hard
+            exercise_5_difficulty:
+                description: 'Difficulty level for Exercise 5'
+                required: false
+                type: choice
+                options:
+                  - simple
+                  - medium
+                  - hard
+                  - v.hard
             language:
                 description: 'Natural language for the exercise description'
                 required: true
@@ -53,10 +100,15 @@ jobs:
           OPENAI_API_KEY: ${{ secrets.OPENAI_TOKEN }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           TASK_SUBJECT: ${{ github.event.inputs.subject }}
-          TASK_DIFFICULTY: ${{ github.event.inputs.difficulty }}
           TASK_LANGUAGE: ${{ github.event.inputs.language }}
+          NUMBER_OF_EXERCISES: ${{ github.event.inputs.number_of_exercises }}
+          EXERCISE_1_DIFFICULTY: ${{ github.event.inputs.exercise_1_difficulty }}
+          EXERCISE_2_DIFFICULTY: ${{ github.event.inputs.exercise_2_difficulty || '' }}
+          EXERCISE_3_DIFFICULTY: ${{ github.event.inputs.exercise_3_difficulty || '' }}
+          EXERCISE_4_DIFFICULTY: ${{ github.event.inputs.exercise_4_difficulty || '' }}
+          EXERCISE_5_DIFFICULTY: ${{ github.event.inputs.exercise_5_difficulty || '' }}
         run: |
-          python scripts/exercise_description.py "${{ secrets.OPENAI_TOKEN }}" "${{ github.event.inputs.subject }}" "${{ github.event.inputs.difficulty }}" "${{ github.event.inputs.language }}"
+          python scripts/exercise_description.py "${{ secrets.OPENAI_TOKEN }}" "${{ github.event.inputs.subject }}" "${{ github.event.inputs.number_of_exercises }}" "${{ github.event.inputs.language }}" "${{ github.event.inputs.exercise_1_difficulty }}" "${{ github.event.inputs.exercise_2_difficulty }}" "${{ github.event.inputs.exercise_3_difficulty }}" "${{ github.event.inputs.exercise_4_difficulty }}" "${{ github.event.inputs.exercise_5_difficulty }}"
 
       # Configure Git user information
       - name: Configure Git
