@@ -16,7 +16,15 @@ def generate_with_retries(client, messages, max_retries=3):
                 print("Retrying...")
     return None
 
-def generate_task_description(api_key, subject, number_of_exercises, language, *exercise_params):
+def parse_exercise_details(details):
+    if details:
+        parts = details.split(",")
+        difficulty = parts[0].strip()
+        skills = ", ".join(parts[1:]).strip() if len(parts) > 1 else "None"
+        return difficulty, skills
+    return None, None
+
+def generate_task_description(api_key, subject, number_of_exercises, language, *exercise_details):
     if not api_key:
         print("Error: OpenAI API key is missing.")
         sys.exit(1)
@@ -24,11 +32,15 @@ def generate_task_description(api_key, subject, number_of_exercises, language, *
     openai.api_key = api_key
 
     # Prepare messages for each exercise
-    exercise_details = []
-    for i in range(int(number_of_exercises)):
-        difficulty = exercise_params[i*2]
-        skills = exercise_params[i*2 + 1]
-        exercise_details.append(f"Exercise {i+1}: Difficulty: {difficulty}, Skills: {skills}")
+    exercise_details_formatted = []
+    for i, details in enumerate(exercise_details):
+        difficulty, skills = parse_exercise_details(details)
+        if difficulty and skills:
+            exercise_details_formatted.append(f"Exercise {i+1}: Difficulty: {difficulty}, Skills: {skills}")
+
+    if not exercise_details_formatted:
+        print("No valid exercises were provided.")
+        sys.exit(1)
 
     messages = [
         {
@@ -43,7 +55,7 @@ def generate_task_description(api_key, subject, number_of_exercises, language, *
             "role": "user",
             "content": f"Create {number_of_exercises} exercises for a task on the subject '{subject}' in {language}. "
                        "Here are the details for each exercise:\n\n" +
-                       "\n".join(exercise_details)
+                       "\n".join(exercise_details_formatted)
         }
     ]
 
@@ -60,14 +72,14 @@ def generate_task_description(api_key, subject, number_of_exercises, language, *
     print("Task description generated successfully.")
 
 if __name__ == "__main__":
-    if len(sys.argv) < 7:
-        print("Usage: exercise_description.py <api_key> <subject> <number_of_exercises> <language> <exercise_1_difficulty> <exercise_1_skills> [<exercise_2_difficulty> <exercise_2_skills> ...]")
+    if len(sys.argv) < 6:
+        print("Usage: exercise_description.py <api_key> <subject> <number_of_exercises> <language> <exercise_1_details> [<exercise_2_details> ...]")
         sys.exit(1)
 
     api_key = sys.argv[1]
     subject = sys.argv[2]
     number_of_exercises = sys.argv[3]
     language = sys.argv[4]
-    exercise_params = sys.argv[5:]
+    exercise_details = sys.argv[5:]
 
-    generate_task_description(api_key, subject, number_of_exercises, language, *exercise_params)
+    generate_task_description(api_key, subject, number_of_exercises, language, *exercise_details)
