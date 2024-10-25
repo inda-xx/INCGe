@@ -40,7 +40,7 @@ def generate_with_retries(client, messages, max_retries=3):
     for attempt in range(max_retries):
         try:
             response = client.chat.completions.create(
-                model="ft:gpt-4o-2024-08-06:kexjobbars:third-times-the-charm:AM0eLhOv",
+                model="gpt-4o-2024-08-06",
                 messages=messages
             )
             return response.choices[0].message.content.strip()
