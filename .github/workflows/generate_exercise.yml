@@ -3,6 +3,18 @@ name: Generate TA Exercise
 on: 
     workflow_dispatch:
         inputs:
+            language:
+                description: 'Programming language for the exercises'
+                required: true
+                type: choice
+                options:
+                  - Java
+                  - Python
+                  - C
+                  - C++
+                  - Rust
+                  - Haskell
+                default: Java
             number_of_exercises:
                 description: 'Number of exercises to generate'
                 required: true
@@ -34,10 +46,6 @@ on:
                 description: 'Details for Exercise 5 (optional, e.g., "medium,File I/O, Subject of Exercise 5")'
                 required: false
                 default: ''
-            language:
-                description: 'Natural language for the exercise description'
-                required: true
-                default: 'English'
             branch_name:
                 description: 'Branch name for this task'
                 required: true
@@ -71,13 +79,14 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           TASK_LANGUAGE: ${{ github.event.inputs.language }}
           NUMBER_OF_EXERCISES: ${{ github.event.inputs.number_of_exercises }}
+          PROGRAMMING_LANGUAGE: ${{ github.event.inputs.language }}
           EXERCISE_1_DETAILS: ${{ github.event.inputs.exercise_1_details }}
           EXERCISE_2_DETAILS: ${{ github.event.inputs.exercise_2_details || '' }}
           EXERCISE_3_DETAILS: ${{ github.event.inputs.exercise_3_details || '' }}
           EXERCISE_4_DETAILS: ${{ github.event.inputs.exercise_4_details || '' }}
           EXERCISE_5_DETAILS: ${{ github.event.inputs.exercise_5_details || '' }}
         run: |
-          python scripts/exercise_description.py "${{ secrets.OPENAI_TOKEN }}" "${{ github.event.inputs.number_of_exercises }}" "${{ github.event.inputs.language }}" \
+          python scripts/exercise_description.py "${{ secrets.OPENAI_TOKEN }}" "${{ github.event.inputs.number_of_exercises }}" "${{ github.event.inputs.language }}" "${{ github.event.inputs.programming_language }}" \
           "${{ github.event.inputs.exercise_1_details }}" "${{ github.event.inputs.exercise_2_details }}" \
           "${{ github.event.inputs.exercise_3_details }}" "${{ github.event.inputs.exercise_4_details }}" \
           "${{ github.event.inputs.exercise_5_details }}"

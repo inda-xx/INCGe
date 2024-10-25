@@ -59,19 +59,41 @@ def parse_exercise_details(details):
         return difficulty, skills, subject
     return None, None, None
 
-def generate_task_description(api_key, number_of_exercises, language, *exercise_details):
+def generate_task_description(api_key, number_of_exercises, language, programming_language, *exercise_details):
     if not api_key:
         print("Error: OpenAI API key is missing.")
         sys.exit(1)
 
     openai.api_key = api_key
 
-    # Prepare a modular prompt for each exercise that integrates the skill maps and challenge level
+    # Prepare modular prompts for each exercise considering difficulty level, language, and skill maps
     exercise_details_formatted = []
     for i, details in enumerate(exercise_details):
         difficulty, skills, subject = parse_exercise_details(details)
         if difficulty and skills and subject:
-            exercise_details_formatted.append(f"Exercise {i+1}: Subject: {subject}, Difficulty: {difficulty}, Skills: {skills}")
+            prompt_section = f"Exercise {i+1}: Subject: {subject}, Difficulty: {difficulty}, Skills: {skills}\n\n"
+            if difficulty == "simple":
+                prompt_section += (
+                    "Focus on introductory concepts for beginners using basic applications of the skills. "
+                    "Encourage understanding of foundational concepts in programming, especially for language: {programming_language}.\n"
+                )
+            elif difficulty == "medium":
+                prompt_section += (
+                    "This exercise should push students to apply their skills in moderately challenging scenarios. "
+                    "Include tasks that involve real-world applications, encouraging problem-solving in {programming_language}.\n"
+                )
+            elif difficulty == "hard":
+                prompt_section += (
+                    "Challenge students to solve complex problems that require deeper knowledge of the specified skills. "
+                    "The tasks should simulate industry-level complexity, especially suited for {programming_language} applications.\n"
+                )
+            elif difficulty == "v.hard":
+                prompt_section += (
+                    "The exercise should be highly challenging, combining multiple skills to solve complex, multi-step problems. "
+                    "Designed for advanced students, it should demand a deep understanding of {programming_language} in practical applications.\n"
+                )
+
+            exercise_details_formatted.append(prompt_section)
 
     if not exercise_details_formatted:
         print("No valid exercises were provided.")
@@ -82,17 +104,16 @@ def generate_task_description(api_key, number_of_exercises, language, *exercise_
         {
             "role": "system",
             "content": (
-                "You are an experienced programming instructor designing exercises for a university-level course. "
-                "These exercises should be challenging and pedagogically valuable, focusing on key programming concepts."
+                "You are an experienced programming instructor creating a set of exercises for a university-level programming lab. "
+                "These exercises should be challenging, pedagogically valuable, and focused on skill development in the specified programming language."
             )
         },
         {
             "role": "user",
-            "content": f"Create {number_of_exercises} exercises for a university-level programming lab in {language}. "
-                       "Each exercise should align with the following learning goals:\n\n{learning_goals}\n\n"
-                       "Here are the details for each exercise:\n\n" +
+            "content": f"Create {number_of_exercises} exercises in {programming_language} that align with these learning goals:\n\n{learning_goals}\n\n"
+                       "Each exercise should follow the provided details:\n\n" +
                        "\n".join(exercise_details_formatted) +
-                       "\n\nMake sure to challenge the students with complex, real-world problems while emphasizing the given skills."
+                       "\n\nDesign these exercises to be challenging and to encourage the students to apply critical thinking and problem-solving skills."
         }
     ]
 
@@ -109,13 +130,14 @@ def generate_task_description(api_key, number_of_exercises, language, *exercise_
     print("Task description generated successfully.")
 
 if __name__ == "__main__":
-    if len(sys.argv) < 5:
-        print("Usage: exercise_description.py <api_key> <number_of_exercises> <language> <exercise_1_details> [<exercise_2_details> ...]")
+    if len(sys.argv) < 6:
+        print("Usage: exercise_description.py <api_key> <number_of_exercises> <language> <programming_language> <exercise_1_details> [<exercise_2_details> ...]")
         sys.exit(1)
 
     api_key = sys.argv[1]
     number_of_exercises = sys.argv[2]
     language = sys.argv[3]
-    exercise_details = sys.argv[4:]
+    programming_language = sys.argv[4]
+    exercise_details = sys.argv[5:]
 
-    generate_task_description(api_key, number_of_exercises, language, *exercise_details)
+    generate_task_description(api_key, number_of_exercises, language, programming_language, *exercise_details)
